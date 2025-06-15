@@ -161,7 +161,7 @@ int main(int argc, char**argv)
 
     }*/
 
-    unsigned int a = 1234599999996, b = 789634999999;
+    unsigned int a = 123459999, b = 7896349;
 
     auto t1 = high_resolution_clock::now();
     unsigned int b_mul_res = basic_integer_mul(a,b);
