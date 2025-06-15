@@ -152,7 +152,7 @@ void merge_sort(vector<int> &input_vector, SORTING_ORDER order)
 {
     unsigned int in_size = input_vector.size();
 
-    if (in_size == 1) return;
+    if (in_size <= 1) return;
 
     // Divid vector in two parts
     vector<int> first_half, second_half;
@@ -226,11 +226,28 @@ void merge_sort(vector<int> &input_vector, SORTING_ORDER order)
 // Vector printing
 void print_arr(vector<int> &input_vector)
 {
-    return;
     cout << "[ ";
-    for (int i=0; i < input_vector.size(); i++) {
-        cout << input_vector[i] << " ";
+
+    if (input_vector.size() > 100)
+    {
+        // If the vector has more then 100 elements just print the first 50 and the last 50
+        for (int i=0; i < 50; i++) {
+            cout << input_vector[i] << " ";
+        }
+
+        cout << "... ";
+
+        for (int i=input_vector.size()-51; i < input_vector.size(); i++) {
+            cout << input_vector[i] << " ";
+        }
     }
+
+    else {
+        for (int i=0; i < input_vector.size(); i++) {
+            cout << input_vector[i] << " ";
+        }
+    }
+
     cout << "]";
 }
 
