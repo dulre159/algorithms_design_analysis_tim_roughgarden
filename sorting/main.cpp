@@ -3,8 +3,15 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <chrono>
 
-using namespace std;
+using std::cout;
+using std::vector;
+/* Stuff to measure execution time */
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+using std::chrono::milliseconds;
 
 enum SORTING_ORDER {
     ASC,
@@ -219,6 +226,7 @@ void merge_sort(vector<int> &input_vector, SORTING_ORDER order)
 // Vector printing
 void print_arr(vector<int> &input_vector)
 {
+    return;
     cout << "[ ";
     for (int i=0; i < input_vector.size(); i++) {
         cout << input_vector[i] << " ";
@@ -239,16 +247,20 @@ int main(int argc, char**argv)
 {
     vector<int> unsorted_vector;
 
-    init_vec(unsorted_vector, 1000, 1000, -1000);
+    init_vec(unsorted_vector, 10000, 1000, -1000);
 
     cout << "Unsorted vector: ";
     print_arr(unsorted_vector);
     cout << "\n";
 
     cout << "Applying selection sort..." << "\n";
+    auto t1 = high_resolution_clock::now();
     sel_sort(unsorted_vector, SORTING_ORDER::ASC);
+    auto t2 = high_resolution_clock::now();
 
-    cout << "Vector after selection sort: ";
+    milliseconds ms_int = duration_cast<milliseconds>(t2 - t1);
+
+    cout << "Vector after selection sort[ execution time: "<< ms_int.count() <<" ms ]: ";
     print_arr(unsorted_vector);
     cout << "\n";
 
@@ -260,9 +272,13 @@ int main(int argc, char**argv)
     cout << "\n";
 
     cout << "Applying insertion sort..." << "\n";
+    t1 = high_resolution_clock::now();
     ins_sort(unsorted_vector, SORTING_ORDER::ASC);
+    t2 = high_resolution_clock::now();
 
-    cout << "Vector after insertion sort: ";
+    ms_int = duration_cast<milliseconds>(t2 - t1);
+
+    cout << "Vector after insertion sort[ execution time: "<< ms_int.count() <<" ms ]: ";
     print_arr(unsorted_vector);
     cout << "\n";
 
@@ -274,9 +290,13 @@ int main(int argc, char**argv)
     cout << "\n";
 
     cout << "Applying bubble sort..." << "\n";
+    t1 = high_resolution_clock::now();
     bubble_sort(unsorted_vector, SORTING_ORDER::ASC);
+    t2 = high_resolution_clock::now();
 
-    cout << "Vector after bubble sort: ";
+    ms_int = duration_cast<milliseconds>(t2 - t1);
+
+    cout << "Vector after bubble sort[ execution time: "<< ms_int.count() <<" ms ]: ";
     print_arr(unsorted_vector);
     cout << "\n";
 
@@ -288,9 +308,13 @@ int main(int argc, char**argv)
     cout << "\n";
 
     cout << "Applying merge sort..." << "\n";
+    t1 = high_resolution_clock::now();
     merge_sort(unsorted_vector, SORTING_ORDER::ASC);
+    t2 = high_resolution_clock::now();
 
-    cout << "Vector after merge sort: ";
+    ms_int = duration_cast<milliseconds>(t2 - t1);
+
+    cout << "Vector after merge sort[ execution time: "<< ms_int.count() <<" ms ]: ";
     print_arr(unsorted_vector);
     cout << "\n";
 
