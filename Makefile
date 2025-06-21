@@ -10,28 +10,28 @@ all: $(out_dir) $(subprj0) $(subprj1) $(subprj2) $(subprj3)
 $(out_dir):
 	mkdir $(out_dir)
 
-$(subprj0): ./$(subprj0)/$(subprj0)
+$(subprj0): $(out_dir) ./$(subprj0)/$(subprj0) 
 
 ./$(subprj0)/$(subprj0): ./$(subprj0)/main.cpp
 	mkdir ./$(subprj0)/$(out_dir)
 	$(CXX) ./$(subprj0)/main.cpp -o ./$(subprj0)/$(out_dir)/$(subprj0)
 	cp ./$(subprj0)/$(out_dir)/$(subprj0) ./$(out_dir)
 
-$(subprj1): ./$(subprj1)/$(subprj1)
+$(subprj1): $(out_dir) ./$(subprj1)/$(subprj1)
 
 ./$(subprj1)/$(subprj1): ./$(subprj1)/main.cpp ./$(subprjcom)/vector_utils.cpp
 	mkdir ./$(subprj1)/$(out_dir)
 	$(CXX) ./$(subprj1)/main.cpp ./$(subprjcom)/vector_utils.cpp -o ./$(subprj1)/$(out_dir)/$(subprj1)
 	cp ./$(subprj1)/$(out_dir)/$(subprj1) ./$(out_dir)
 
-$(subprj2): ./$(subprj2)/$(subprj2)
+$(subprj2): $(out_dir) ./$(subprj2)/$(subprj2)
 
 ./$(subprj2)/$(subprj2): ./$(subprj2)/main.cpp ./$(subprjcom)/vector_utils.cpp
 	mkdir ./$(subprj2)/$(out_dir)
 	$(CXX) ./$(subprj2)/main.cpp ./$(subprjcom)/vector_utils.cpp -o ./$(subprj2)/$(out_dir)/$(subprj2)
 	cp ./$(subprj2)/$(out_dir)/$(subprj2) ./$(out_dir)
 
-$(subprj3): ./$(subprj3)/$(subprj3)
+$(subprj3): $(out_dir) ./$(subprj3)/$(subprj3)
 
 ./$(subprj3)/$(subprj3): ./$(subprj3)/main.cpp ./$(subprjcom)/vector_utils.cpp
 	mkdir ./$(subprj3)/$(out_dir)
