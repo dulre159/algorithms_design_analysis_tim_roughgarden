@@ -1,8 +1,8 @@
+#include "main.h"
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
 #include <string>
-#include <vector>
 #include <chrono>
 
 using std::cout;
@@ -12,32 +12,6 @@ using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;
 using std::chrono::duration;
 using std::chrono::milliseconds;
-
-enum SORTING_ORDER {
-    ASC,
-    DESC,
-};
-
-// Unsort the array
-void unsort_vector(vector<int> &input_vector)
-{
-    unsigned int max_runs = input_vector.size();
-    int swap_helper;
-
-    srand(time(0));
-
-    while(max_runs-- > 0) {
-        // Generate a random number between 0 and input_vector.size()
-        int randomNum1 = rand() % (input_vector.size()-1);
-        // Generate a random number between 0 and input_vector.size()
-        int randomNum2 = rand() % (input_vector.size()-1);
-
-        // Swap number at position randomNum1 with randomNum2
-        swap_helper = input_vector[randomNum1];
-        input_vector[randomNum1] = input_vector[randomNum2];
-        input_vector[randomNum2] = swap_helper;
-    }
-}
 
 // Selection sort
 // For each element A compare it with all the others B
@@ -223,43 +197,6 @@ void merge_sort(vector<int> &input_vector, SORTING_ORDER order)
     }
 }
 
-// Vector printing
-void print_arr(vector<int> &input_vector)
-{
-    cout << "[ ";
-
-    if (input_vector.size() > 100)
-    {
-        // If the vector has more then 100 elements just print the first 50 and the last 50
-        for (int i=0; i < 50; i++) {
-            cout << input_vector[i] << " ";
-        }
-
-        cout << "... ";
-
-        for (int i=input_vector.size()-51; i < input_vector.size(); i++) {
-            cout << input_vector[i] << " ";
-        }
-    }
-
-    else {
-        for (int i=0; i < input_vector.size(); i++) {
-            cout << input_vector[i] << " ";
-        }
-    }
-
-    cout << "]";
-}
-
-// Init input vector
-void init_vec(vector<int> &input_vector, unsigned int num_ele, int max, int min)
-{
-    srand(time(0));
-    for (int i=0; i < num_ele; i++) {
-        input_vector.push_back((rand() % max)+min);
-    }
-}
-
 int main(int argc, char**argv)
 {
     vector<int> unsorted_vector;
@@ -267,7 +204,7 @@ int main(int argc, char**argv)
     init_vec(unsorted_vector, 10000, 1000, -1000);
 
     cout << "Unsorted vector: ";
-    print_arr(unsorted_vector);
+    print_vec(unsorted_vector);
     cout << "\n";
 
     cout << "Applying selection sort..." << "\n";
@@ -278,14 +215,14 @@ int main(int argc, char**argv)
     milliseconds ms_int = duration_cast<milliseconds>(t2 - t1);
 
     cout << "Vector after selection sort[ execution time: "<< ms_int.count() <<" ms ]: ";
-    print_arr(unsorted_vector);
+    print_vec(unsorted_vector);
     cout << "\n";
 
     cout << "Unsorting vector..." << "\n";
     unsort_vector(unsorted_vector);
 
     cout << "Unsorted vector: ";
-    print_arr(unsorted_vector);
+    print_vec(unsorted_vector);
     cout << "\n";
 
     cout << "Applying insertion sort..." << "\n";
@@ -296,14 +233,14 @@ int main(int argc, char**argv)
     ms_int = duration_cast<milliseconds>(t2 - t1);
 
     cout << "Vector after insertion sort[ execution time: "<< ms_int.count() <<" ms ]: ";
-    print_arr(unsorted_vector);
+    print_vec(unsorted_vector);
     cout << "\n";
 
     cout << "Unsorting vector..." << "\n";
     unsort_vector(unsorted_vector);
 
     cout << "Unsorted vector: ";
-    print_arr(unsorted_vector);
+    print_vec(unsorted_vector);
     cout << "\n";
 
     cout << "Applying bubble sort..." << "\n";
@@ -314,14 +251,14 @@ int main(int argc, char**argv)
     ms_int = duration_cast<milliseconds>(t2 - t1);
 
     cout << "Vector after bubble sort[ execution time: "<< ms_int.count() <<" ms ]: ";
-    print_arr(unsorted_vector);
+    print_vec(unsorted_vector);
     cout << "\n";
 
     cout << "Unsorting vector..." << "\n";
     unsort_vector(unsorted_vector);
 
     cout << "Unsorted vector: ";
-    print_arr(unsorted_vector);
+    print_vec(unsorted_vector);
     cout << "\n";
 
     cout << "Applying merge sort..." << "\n";
@@ -332,7 +269,7 @@ int main(int argc, char**argv)
     ms_int = duration_cast<milliseconds>(t2 - t1);
 
     cout << "Vector after merge sort[ execution time: "<< ms_int.count() <<" ms ]: ";
-    print_arr(unsorted_vector);
+    print_vec(unsorted_vector);
     cout << "\n";
 
     return 0;
