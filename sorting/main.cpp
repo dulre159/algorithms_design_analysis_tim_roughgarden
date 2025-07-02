@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <string>
 #include <chrono>
+#include <unistd.h>
 
 using std::cout;
 using std::vector;
@@ -117,91 +118,54 @@ void ins_sort(vector<int> &input_vector, SORTING_ORDER order)
     }
 }
 
-// Merge sort
-// Divid the input array in half and recursevly call on both halfs
-// Merge the output
-// Merging is done using two pointers on each sorted half
-// The output array is populated choosing the lower or higher value between the two pointed values
-void merge_sort(vector<int> &input_vector, SORTING_ORDER order)
+void show_help()
 {
-    unsigned int in_size = input_vector.size();
-
-    if (in_size <= 1) return;
-
-    // Divid vector in two parts
-    vector<int> first_half, second_half;
-    
-    for (int i = 0; i < in_size; i++)
-    {
-        if (i < in_size/2)
-        {
-            first_half.push_back(input_vector[i]);
-        }
-        else
-        {
-            second_half.push_back(input_vector[i]);
-        } 
-    }
-
-    merge_sort(first_half, order);
-    merge_sort(second_half, order);
-
-    // Merge step
-    int j = 0, l = 0;
-    for (int i=0; i < in_size; i++) {
-
-        if (j < first_half.size() && l < second_half.size())
-        {
-             if (order == SORTING_ORDER::ASC)
-            {
-                if (first_half[j] < second_half[l])
-                {
-                    input_vector[i] = first_half[j];
-                    j++;
-                } 
-                else
-                {
-                    input_vector[i] = second_half[l];
-                    l++;
-                }
-            }
-            else
-            {
-                if (first_half[j] > second_half[l])
-                {
-                    input_vector[i] = first_half[j];
-                    j++;
-                } 
-                else
-                {
-                    input_vector[i] = second_half[l];
-                    l++;
-                }
-            }
-
-            
-        }
-        else
-        {
-            if (j < first_half.size()) {
-                input_vector[i] = first_half[j];
-                j++;
-            }
-
-            if (l < second_half.size()) {
-                input_vector[i] = second_half[l];
-                l++;
-            }
-        }
-        
-    }
+    cout << "Utility to sort randomly generated integers using various sorting arlgoritms\n";
+    cout << "Arguments:\n";
+    cout << "p number of integers to generate and sort - default 10\n";
+    cout << "n minimum integer to generate - default 0\n";
+    cout << "m maximum integer to generate - default 10\n";
+    cout << "Example for sorting 5 integers in range [-10, 10]: program_name -p 5 -n -10 -m 10\n";
 }
 
 int main(int argc, char**argv)
 {
+
+    // Parse cmd args using getopt
+    int c;
+    long int num_ele=10, min=0, max=10;
+    while((c = getopt(argc, argv, ":p:m:n:h")) != -1)
+    {
+        switch (c)
+        {
+        case 'p':
+            num_ele = strtol(optarg, NULL, 10);
+            break;
+        case 'm':
+            max = strtol(optarg, NULL, 10);
+            break;
+        case 'n':
+            min = strtol(optarg, NULL, 10);
+            break;
+        case 'h':
+            show_help();
+            exit(0);
+            break;
+        default:
+            break;
+        }
+    }
+
+    if (num_ele == 0) {
+        cout << "Invalid number of elements to sort...\n";
+        exit(-1);
+    }
+
+    cout << "Creating vector with " << num_ele << " numbers in range [" << min << "," << max << "]...\n";
+
     vector<int> unsorted_vector;
 
-    init_vec(unsorted_vector, 10000, 1000, -1000);
+    init_vec(unsorted_vector, num_ele, min, max);
 
     cout << "Unsorted vector: ";
     print_vec(unsorted_vector);
@@ -263,7 +227,18 @@ int main(int argc, char**argv)
 
     cout << "Applying merge sort..." << "\n";
     t1 = high_resolution_clock::now();
-    merge_sort(unsorted_vector, SORTING_ORDER::ASC);
+    merge_sort<int>(unsorted_vector, SORTING_ORDER::ASC, [](const int& x,const int& y, const SORTING_ORDER sort_ord) -> bool {
+        if (sort_ord == SORTING_ORDER::ASC)
+        {
+            if (x < y) return true;
+            else return false;
+        }
+        else
+        {
+            if (x > y) return true;
+            else return false;
+        }
+    });
     t2 = high_resolution_clock::now();
 
     ms_int = duration_cast<milliseconds>(t2 - t1);

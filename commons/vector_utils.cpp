@@ -1,5 +1,9 @@
 #include "vector_utils.h"
 #include <iostream>
+#include <chrono>
+#include <cstdlib>
+#include <ctime>
+#include <unistd.h>
 
 using std::cout;
 using std::vector;
@@ -56,19 +60,21 @@ void print_vec(vector<int> &input_vector)
 void unsort_vector(vector<int> &input_vector)
 {
     unsigned int max_runs = input_vector.size();
-    int swap_helper;
+    int swap_helper=0;
 
-    srand(time(0));
+    const std::chrono::time_point<std::chrono::steady_clock> cur_time = std::chrono::steady_clock::now();
+
+    std::srand(cur_time.time_since_epoch().count());
 
     while(max_runs-- > 0) {
-        // Generate a random number between 0 and input_vector.size()
-        int randomNum1 = rand() % (input_vector.size()-1);
-        // Generate a random number between 0 and input_vector.size()
-        int randomNum2 = rand() % (input_vector.size()-1);
+        // Generate a random number between 0 and input_vector.size() - 1
+        int index0 = std::rand() % input_vector.size();
+        // Generate a random number between 0 and input_vector.size() - 1 
+        int index1 = std::rand() % input_vector.size();
 
         // Swap number at position randomNum1 with randomNum2
-        swap_helper = input_vector[randomNum1];
-        input_vector[randomNum1] = input_vector[randomNum2];
-        input_vector[randomNum2] = swap_helper;
+        swap_helper = input_vector[index0];
+        input_vector[index0] = input_vector[index1];
+        input_vector[index1] = swap_helper;
     }
 }
