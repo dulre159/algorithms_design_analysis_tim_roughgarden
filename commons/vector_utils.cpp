@@ -21,7 +21,9 @@ void init_vec(vector<int> &input_vector, unsigned int num_ele, int min, int max)
         return;
     }
 
-    srand(time(0));
+    const std::chrono::time_point<std::chrono::steady_clock> cur_time = std::chrono::steady_clock::now();
+    std::srand(cur_time.time_since_epoch().count());
+
     for (int i=0; i < num_ele; i++) {
         input_vector.push_back((rand() % max)+min);
     }
