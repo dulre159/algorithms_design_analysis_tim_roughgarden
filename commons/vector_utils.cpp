@@ -38,19 +38,19 @@ void print_vec(vector<int> &input_vector)
     if (input_vector.size() > 100)
     {
         // If the vector has more then 100 elements just print the first 50 and the last 50
-        for (int i=0; i < 50; i++) {
+        for (unsigned int i=0; i < 50; i++) {
             cout << input_vector[i] << " ";
         }
 
         cout << "... ";
 
-        for (int i=input_vector.size()-51; i < input_vector.size(); i++) {
+        for (unsigned int i=input_vector.size()-51; i < input_vector.size(); i++) {
             cout << input_vector[i] << " ";
         }
     }
 
     else {
-        for (int i=0; i < input_vector.size(); i++) {
+        for (unsigned int i=0; i < input_vector.size(); i++) {
             cout << input_vector[i] << " ";
         }
     }
