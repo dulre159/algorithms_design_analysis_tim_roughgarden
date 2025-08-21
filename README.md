@@ -1,10 +1,10 @@
 # Unofficial - Algorithms Design Analysis Tim Roughgarden
 
-Unofficial implementation of algorithms described in the stanford course of fundamentals of algorithm design and analysis by Tim Roughgarden.
+Unofficial implementation of algorithms described in the Stanford course on Fundamentals of Algorithm Design and Analysis by Tim Roughgarden.
 
 ## Usage
 
-To compile all the sub projects use:
+To compile all the sub-projects, use:
 
 ```Commands
 make all
@@ -12,13 +12,13 @@ make all
 
 All the executables can be found in the ***out*** directory in the main folder.
 
-To build a specific sub project use:
+To build a specific sub-project use:
 
 ```Commands
 make subprj_name
 ```
 
-For example to compile te ***sorting*** subproject use:
+For example to compile the ***sorting*** sub-project use:
 
 ```Commands
 make sorting
