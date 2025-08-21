@@ -44,3 +44,8 @@ clean:
 	rm -rf ./$(subprj2)/$(out_dir)
 	rm -rf ./$(subprj3)/$(out_dir)
 	rm -rf ./$(out_dir)
+
+	rm -rf ./$(subprj0)/main
+	rm -rf ./$(subprj1)/main
+	rm -rf ./$(subprj2)/main
+	rm -rf ./$(subprj3)/main

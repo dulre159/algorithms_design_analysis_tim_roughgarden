@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <string>
 #include <chrono>
+#include <random>
+#include <algorithm>
 
 using std::cout;
 using std::vector;
@@ -16,6 +18,7 @@ using std::chrono::milliseconds;
 /* 
     Brute-force inversions counter 
     With 2 indices over the vector we count the number of inversions
+    Complexity O(n^2)
 */
 void brute_inv_cnt(vector<int> &input_vector, unsigned int &tot_invs)
 {
@@ -35,12 +38,13 @@ void brute_inv_cnt(vector<int> &input_vector, unsigned int &tot_invs)
 
 /*
     Recursive inversions counter
-    "Divide and conquer" approach application
+    "Divide and conquer" approach
     There are three types of inversions: left, right and split
-    Counting split inversions is done using the merge steps of the merge sort algorithm
-    The split inversions of the second right half are the right inversions
+    Counting split inversions is done using the merge step of the merge sort algorithm
+    The split inversions of the second/right half are the right inversions
     In particular during the merge step each time an element 'er' from the right half(second half)
     is to be inserted into the merged vector, the remaining number of elements in the left vector(first half) are the inversions for 'er';
+    Complexity O(nlogn)
 */
 void recursive_inv_cnt(vector<int> &input_vector, unsigned int &tot_invs)
 {
@@ -49,19 +53,10 @@ void recursive_inv_cnt(vector<int> &input_vector, unsigned int &tot_invs)
     if (in_size == 1) return;
 
     // Divid vector in two parts
-    vector<int> first_half, second_half;
-    
-    for (int i = 0; i < in_size; i++)
-    {
-        if (i < in_size/2)
-        {
-            first_half.push_back(input_vector[i]);
-        }
-        else
-        {
-            second_half.push_back(input_vector[i]);
-        } 
-    }
+    vector<int> first_half (in_size/2), second_half (in_size - in_size/2);
+
+    std::copy_n(input_vector.cbegin(), in_size/2, first_half.begin());
+    std::copy(input_vector.cbegin()+(in_size/2), input_vector.cend(), second_half.begin());
 
     recursive_inv_cnt(first_half, tot_invs);
     recursive_inv_cnt(second_half, tot_invs);
@@ -100,14 +95,21 @@ void recursive_inv_cnt(vector<int> &input_vector, unsigned int &tot_invs)
         
     }
 }
-
-int main(int argc, char**argv)
-{
     //vector<int> in_vec = {1, 3, 5, 2, 4, 6};
     //vector<int> in_vec = {6,5,4,3,2,1};
-    vector<int> in_vec;
+int main(int argc, char**argv)
+{
     unsigned int inversions_counter = 0;
-    init_vec(in_vec, 10000, 0, 1000);
+    int min = 0, max = 1000, num_ele = 10000;
+    vector<int> in_vec (num_ele);
+    
+    std::random_device rdev;
+    std::mt19937 rng_alg(rdev());
+    std::uniform_int_distribution dist(min, max);
+    
+    std::generate(in_vec.begin(), in_vec.end(), [&rng_alg, &dist](){
+        return dist(rng_alg);
+    });
 
     cout << "Vector: ";
     print_vec(in_vec);

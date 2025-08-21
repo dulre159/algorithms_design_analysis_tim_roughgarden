@@ -1,12 +1,26 @@
 #include "../commons/vector_utils.h"
-#include "../sorting/main.h"
+#include "../sorting/sorting.h"
 #include <iostream>
-#include <cmath>
-#include <cstdlib>
 #include <string>
 #include <chrono>
+#include <algorithm>
+#include <random>
+#include <cmath>
 
 struct POINT_2D {
+    POINT_2D() = default;
+
+    POINT_2D(const int& l_x, const int& l_y){
+        x = l_x;
+        y = l_y;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const POINT_2D& p2d)
+    {
+        os << "{" << p2d.x << "," << p2d.y << '}';
+        return os;
+    }
+
     double x;
     double y;
 };
@@ -19,85 +33,63 @@ using std::chrono::duration_cast;
 using std::chrono::duration;
 using std::chrono::milliseconds;
 
-void print_point_2D(const POINT_2D &p, const char enc_char_start, const char enc_char_end, const char sep_char, const bool do_newline)
-{
-    cout << enc_char_start << p.x << sep_char << p.y << enc_char_end << (do_newline == true ? "\n" : "");
-}
-
-// Computes distance between two 2D points
-double dist_points_2D(const POINT_2D &a,const POINT_2D &b)
+// Computes the euclidean distance between two 2D points
+inline constexpr auto dist_points_2D(const POINT_2D &a,const POINT_2D &b)
 {
     return sqrt(pow((b.x-a.x),2) + pow((b.y-a.y),2));
 }
 
 // Brute force algorithm to find the closest pair of 2D points
-// Complexity O(N^2)
-std::tuple<POINT_2D, POINT_2D> bf_cp_alg(vector<POINT_2D> &in_P2D_vec)
+// Complexity O(n^2)
+auto bf_cp_alg(vector<POINT_2D> &in_P2D_vec)
 {
     int cp_idxi=-1,cp_idxj=-1;
     // There might be a better way then initializing the dist this way?
     double cur_min_dist = 9000000;
-    std::tuple<POINT_2D, POINT_2D> cp_out;
+    // In case no pair is found the pair [0,0] is returned
+    auto cp_out = std::pair<POINT_2D,POINT_2D>({POINT_2D{0,0}, POINT_2D{0,0}});
 
-    std::get<0>(cp_out) = POINT_2D{0,0};
-    std::get<1>(cp_out) = POINT_2D{0,0};
-    
-
-    for (int i=0; i < in_P2D_vec.size(); i++)
-    {
-        for (int j=0; j < in_P2D_vec.size(); j++)
-        {
+    std::for_each(in_P2D_vec.cbegin(), in_P2D_vec.cend(), [&cp_out, &cur_min_dist, &in_P2D_vec](auto a){
+        std::for_each(in_P2D_vec.cbegin(), in_P2D_vec.cend(), [&a, &cp_out, &cur_min_dist](auto b){
             // Skip same points
-            if (in_P2D_vec[i].x != in_P2D_vec[j].x && in_P2D_vec[i].y != in_P2D_vec[j].y)
-            {  
-                double dist = dist_points_2D(in_P2D_vec[i], in_P2D_vec[j]);
-                if (dist < cur_min_dist)
-                {
-                    cur_min_dist = dist;
-                    cp_idxi = i;
-                    cp_idxj = j;
+            if (a.x != b.x && a.y != b.y) {
+                auto dist_ab = dist_points_2D(a, b);
+                if (dist_ab < cur_min_dist) {
+                    cur_min_dist = dist_ab;
+                    std::get<0>(cp_out) = a;
+                    std::get<1>(cp_out) = b;
                 }
             }
-            
-        }
-    }
+        }); 
+    });
 
-    if (cp_idxi != -1)
-    {
-        std::get<0>(cp_out) = in_P2D_vec[cp_idxi];
-    }
-    if (cp_idxj != -1)
-    {
-        std::get<1>(cp_out) = in_P2D_vec[cp_idxj];
-    }
-
-    // In case no pair is found the pair [0,0] is returned
     return cp_out;
 }
 
 int main(int argc, char**argv)
 {
-    vector<POINT_2D> in_2D_vec;
-    vector<int> in_x_vec;
-    vector<int> in_y_vec;
-    init_vec(in_x_vec, 10, -10, 10);
-    init_vec(in_y_vec, 10, -10, 10);
+    auto num_ele = 10000, min_ele = -10, max_ele = 10;
+    auto in_2D_vec = vector<POINT_2D>(num_ele, POINT_2D{0,0});
 
-    for (int i=0; i < 10; i++)
-    {
-        POINT_2D tmp_pt2d;
-        tmp_pt2d.x = in_x_vec[i];
-        tmp_pt2d.y = in_y_vec[i];
-        in_2D_vec.push_back(tmp_pt2d);
-    }
+    std::random_device rndev;
+    std::mt19937 rng_alg (rndev());
+    std::uniform_int_distribution dist(min_ele, max_ele);
 
-    std::tuple<POINT_2D, POINT_2D> bf_cp = bf_cp_alg(in_2D_vec);
+    std::generate(in_2D_vec.begin(), in_2D_vec.end(), [&rng_alg, &dist](){
+        return POINT_2D(dist(rng_alg), dist(rng_alg));
+    });
 
-    cout << "Closest pair is: { ";
-    print_point_2D(std::get<0>(bf_cp), '[', ']', ',', false);
-    cout << " , ";
-    print_point_2D(std::get<1>(bf_cp), '[', ']', ',', false);
-    cout << " }\n";
+    cout << "Generated 2D points : ";
+    print_vec(in_2D_vec);
+    cout << "\n";
+
+    cout << "Applying bruteforce method..." << std::endl;
+    auto t0 = high_resolution_clock::now();
+    auto bf_cp = bf_cp_alg(in_2D_vec);
+    auto t1 = high_resolution_clock::now();
+    auto dt = duration_cast<milliseconds>(t1-t0);
+    cout << "Execution took "<< dt.count() << " ms" << std::endl;
+    cout << "Closest pair is: [ " << std::get<0>(bf_cp) << " , " << std::get<1>(bf_cp) << " ]" <<std::endl;
 
     return 0;
 }
