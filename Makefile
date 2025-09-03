@@ -5,6 +5,9 @@ subprj3 := closest_pair
 subprjcom := commons
 out_dir := out
 
+debug: CXXFLAGS += -g
+debug: all
+
 all: $(out_dir) $(subprj0) $(subprj1) $(subprj2) $(subprj3)
 
 $(out_dir):
@@ -33,9 +36,9 @@ $(subprj2): $(out_dir) ./$(subprj2)/$(subprj2)
 
 $(subprj3): $(out_dir) ./$(subprj3)/$(subprj3)
 
-./$(subprj3)/$(subprj3): ./$(subprj3)/main.cpp ./$(subprjcom)/vector_utils.cpp
+./$(subprj3)/$(subprj3): ./$(subprj3)/main.cpp ./$(subprjcom)/vector_utils.cpp ./$(subprjcom)/commons.cpp
 	mkdir -p ./$(subprj3)/$(out_dir)
-	$(CXX) ./$(subprj3)/main.cpp ./$(subprjcom)/vector_utils.cpp -o ./$(subprj3)/$(out_dir)/$(subprj3)
+	$(CXX) ./$(subprj3)/main.cpp ./$(subprjcom)/vector_utils.cpp ./$(subprjcom)/commons.cpp -o ./$(subprj3)/$(out_dir)/$(subprj3)
 	cp ./$(subprj3)/$(out_dir)/$(subprj3) ./$(out_dir)
 
 clean:
