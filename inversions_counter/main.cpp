@@ -22,16 +22,12 @@ using std::chrono::milliseconds;
 */
 void brute_inv_cnt(vector<int> &input_vector, unsigned int &tot_invs)
 {
-    unsigned int inv_s = input_vector.size();
-
-    for (int i = 0; i < inv_s; i++)
-    {
-        for (int j = i; j < inv_s; j++)
-        {
-            if (input_vector[i] > input_vector[j]) {
+    for (auto it1 = input_vector.begin(); it1 != input_vector.end(); it1++) {
+        for (auto it2 = it1; it2 != input_vector.end(); it2++) {
+            if (*it1 > *it2) {
                 tot_invs += 1;
             }
-        }
+        }   
     }
 }
 
@@ -62,20 +58,19 @@ void recursive_inv_cnt(vector<int> &input_vector, unsigned int &tot_invs)
     recursive_inv_cnt(second_half, tot_invs);
 
     // Merge and inversion count step
-    int j = 0, l = 0;
-    for (int i=0; i < in_size; i++) {
-
+    size_t j = 0, l = 0;
+    std::for_each(input_vector.begin(), input_vector.end(), [&j, &l, &first_half, &second_half, &tot_invs](auto &e){
         if (j < first_half.size() && l < second_half.size())
         {
                 // We count split inversions here
                 if (first_half[j] <= second_half[l])
                 {
-                    input_vector[i] = first_half[j];
+                    e = first_half[j];
                     j++;
                 } 
                 else
                 {
-                    input_vector[i] = second_half[l];
+                    e = second_half[l];
                     l++;
                     tot_invs += first_half.size() - j;
                 }
@@ -83,21 +78,21 @@ void recursive_inv_cnt(vector<int> &input_vector, unsigned int &tot_invs)
         else
         {
             if (j < first_half.size()) {
-                input_vector[i] = first_half[j];
+                e = first_half[j];
                 j++;
             }
 
             if (l < second_half.size()) {
-                input_vector[i] = second_half[l];
+                e = second_half[l];
                 l++;
             }
         }
-        
-    }
+    });
+
 }
     //vector<int> in_vec = {1, 3, 5, 2, 4, 6};
     //vector<int> in_vec = {6,5,4,3,2,1};
-int main(int argc, char**argv)
+int main(/*int argc, char**argv*/)
 {
     unsigned int inversions_counter = 0;
     int min = 0, max = 1000, num_ele = 10000;

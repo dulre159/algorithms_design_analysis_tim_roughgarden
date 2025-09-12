@@ -136,7 +136,7 @@ unsigned int karatsuba_integer_mul(unsigned int x, unsigned int y)
     return (pow(10, 2*m)*ac) + (pow(10, m)*atdpdtc) + bd;
 }
 
-int main(int argc, char**argv)
+int main(int /*argc*/, char** /*argv*/)
 {   
     /*srand(time(0));
     uint min = 1000, max = 100000;

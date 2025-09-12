@@ -18,6 +18,7 @@
 struct POINT_2D {
     POINT_2D()
     {
+        // Default point is the origin
         x = y = 0;
     }
 
@@ -40,19 +41,80 @@ struct POINT_2D {
     }
 
     bool operator==(const POINT_2D& b) const {
-        return are_equal_f(x, b.x) && are_equal_f(y, b.y);
+        return (x == b.x && y == b.y);
     }
 
-    float x;
-    float y;
+    void operator=(const POINT_2D &b) {
+        x = b.x;
+        y = b.y;
+    }
+
+    int x;
+    int y;
 };
 
+// Alias for a pair of 2d points
+using PO2DPS = std::pair<POINT_2D, POINT_2D>;
+
+// Custom hasher for set of POINT_2D
 struct POINT_2D_HASHER {
     size_t operator()(const POINT_2D& p) const{
-        std::ostringstream oss;
-        oss << p.x << "_" << p.y;
-        std::size_t h = std::hash<std::string>{}(oss.str());
-        return h;
+        return std::hash<int>()(p.x) ^ (std::hash<int>()(p.y) << 1);
+    }
+};
+
+// Custom hasher for set of pairs of POINT_2D
+struct PAIR_OF_POINT_2D_HASHER {
+    size_t operator()(const PO2DPS& p) const{
+
+        // Sort the pair manually
+        // Example for p1={(1,2), (-3,1)} and p2={(-3,1), (1,2)}
+        // for p1 a=p1.second and b = p1.first
+        // for p2 a=p1.first and b = p1.second
+        
+        // Example for p1={(1,2), (1,2)} and p2={(1,2), (1,2)}
+        // for p1 a=p1.first and b = p1.second
+        // for p2 a=p1.first and b = p1.second
+
+        // Example for p1={(1,2), (2,1)} and p2={(2,1), (1,2)}
+        // for p1 a=p1.first and b = p1.second
+        // for p2 a=p1.second and b = p1.first
+
+        // Example for p1={(1,2), (2,1)} and p2={(2,1), (1,2)}
+        // for p1 a=p1.first and b = p1.second
+        // for p2 a=p1.second and b = p1.first
+
+        // Example for p1={(1,2), (-3,-1)} and p2={(-3,-1), (1,2)}
+        // for p1 a=p1.second and b = p1.first
+        // for p2 a=p1.first and b = p1.second
+
+
+        const POINT_2D& a = (p.first.x < p.second.x || (p.first.x == p.second.x && p.first.y <= p.second.y)) ? p.first : p.second;
+        const POINT_2D& b = (a == p.first) ? p.second : p.first;
+
+        auto h1 = POINT_2D_HASHER{}(a);
+        auto h2 = POINT_2D_HASHER{}(b);
+
+        return h1 ^ (h2 << 1);
+    }
+};
+
+// Compair two pairs of POINT_2D
+bool cmpp_nord(const PO2DPS &a, const PO2DPS &b)
+{
+    if (a.first == b.first && a.second == b.second) return true;
+
+    if (a.first == b.second && a.second == b.first) return true;
+
+    return false;
+}
+
+// Equality functor
+struct PAIR_OF_POINT_2D_EQUALITY {
+    size_t operator()(const PO2DPS& a, const PO2DPS &b) const{
+        if ((a.first == b.first && a.second == b.second) || (a.first == b.second && a.second == b.first)) return true;
+
+        return false;
     }
 };
 
@@ -68,43 +130,31 @@ inline constexpr double euc_dist_p2d(const POINT_2D &a,const POINT_2D &b)
 {
     return sqrt(pow((b.x-a.x),2) + pow((b.y-a.y),2));
 }
-inline double euc_dist_p2d(const std::pair<POINT_2D, POINT_2D> &pp)
+inline double euc_dist_p2d(const PO2DPS &pp)
 {
-    auto a = pp.first;
-    auto b = pp.second;
-    return sqrt(pow((b.x-a.x),2) + pow((b.y-a.y),2));
-}
-
-// Compair two pairs of POINT_2D
-bool cmpp_nord(const std::pair<POINT_2D, POINT_2D> &a, const std::pair<POINT_2D, POINT_2D> &b)
-{
-    if (a.first == b.first && a.second == b.second) return true;
-
-    if (a.first == b.second && a.second == b.first) return true;
-
-    return false;
+    return sqrt(pow((pp.second.x-pp.first.x),2) + pow((pp.second.y-pp.first.y),2));
 }
 
 /*
 *   Closest pair algorithm : brute force search
 *   Complexity O(n^2)
 */
-auto bf_cp_alg(vector<POINT_2D> &in_P2D_vec)
+auto bf_cp_alg(const vector<POINT_2D> &in_P2D_vec)
 {
-    auto out_closest_pairs = std::make_unique<std::vector<std::pair<POINT_2D, POINT_2D>>>();
+    auto out_closest_pairs = std::vector<PO2DPS>();
 
     if (in_P2D_vec.size() >= 2) {
     
         // There might be a better way then initializing the dist this way?
         double cur_min_dist = std::numeric_limits<double>::max();
-        std::unordered_map<double, std::vector<std::pair<POINT_2D, POINT_2D>>> map_dist_list_of_pairs;
+        std::unordered_map<double, std::vector<PO2DPS>> map_dist_list_of_pairs;
         
         for (auto it1 = in_P2D_vec.begin(); it1 != in_P2D_vec.end(); it1++) {
             for (auto it2 = std::next(it1); it2 != in_P2D_vec.end(); it2++) {
                 // Skip same points
                 if (*it1 == *it2) continue;
+                
                 auto dist_ab = euc_dist_p2d(*it1, *it2);
-
                 bool dieq = are_equal_d(dist_ab, cur_min_dist);
                 bool dilt = is_less_than_d(dist_ab, cur_min_dist);
 
@@ -114,22 +164,23 @@ auto bf_cp_alg(vector<POINT_2D> &in_P2D_vec)
                         cur_min_dist = dist_ab;
 
                     if (map_dist_list_of_pairs.find(cur_min_dist) == map_dist_list_of_pairs.cend()) {
-                        map_dist_list_of_pairs[cur_min_dist] = std::vector<std::pair<POINT_2D,POINT_2D>>{};
+                        map_dist_list_of_pairs[cur_min_dist] = std::vector<PO2DPS>{};
                     }
 
-                    map_dist_list_of_pairs[cur_min_dist].push_back(std::pair<POINT_2D,POINT_2D>{*it1, *it2});
+                    map_dist_list_of_pairs[cur_min_dist].push_back(PO2DPS{*it1, *it2});
                 }
             } 
         }
 
         if (map_dist_list_of_pairs.find(cur_min_dist) != map_dist_list_of_pairs.cend()) {
-            out_closest_pairs->clear();
-            out_closest_pairs->resize(map_dist_list_of_pairs[cur_min_dist].size());
-            std::copy(map_dist_list_of_pairs[cur_min_dist].begin(), map_dist_list_of_pairs[cur_min_dist].end(), out_closest_pairs->begin());
+            out_closest_pairs.clear();
+            out_closest_pairs.resize(map_dist_list_of_pairs[cur_min_dist].size());
+            std::copy(map_dist_list_of_pairs[cur_min_dist].begin(), map_dist_list_of_pairs[cur_min_dist].end(), out_closest_pairs.begin());
         }
     }
 
-    return std::move(out_closest_pairs);
+    // Thanks to RVO out_closest_pairs should be build in the caller stack
+    return out_closest_pairs;
 
 }
 
@@ -151,9 +202,9 @@ auto bf_cp_alg(vector<POINT_2D> &in_P2D_vec)
 *   7) If the closest pair is a split pair (p3,q3) we invoke special function closest_split_pair(p_x, p_y, dm) to find it
 *   8) In the unlucky case the running time of the overall algorithm depends on the running time of closest_split_pair(...)
 */
-auto dc_cp_alg(vector<POINT_2D> &in_P2D_vec)
+auto dc_cp_alg(const vector<POINT_2D> &in_P2D_vec)
 {
-    auto out_closest_pairs = std::make_unique<std::vector<std::pair<POINT_2D, POINT_2D>>>();
+    auto out_closest_pairs = std::vector<PO2DPS>();
 
     if (in_P2D_vec.size() < 2) return out_closest_pairs;   
 
@@ -168,11 +219,11 @@ auto dc_cp_alg(vector<POINT_2D> &in_P2D_vec)
     my_sorting::merge_sort<POINT_2D>(p_x, my_sorting::SORTING_ORDER::ASC, [](const POINT_2D& a, const POINT_2D& b, my_sorting::SORTING_ORDER sort_ord){
         if (sort_ord == my_sorting::SORTING_ORDER::ASC)
         {
-            if (is_less_than_f(a.x, b.x)) return true;
+            if (a.x < b.x) return true;
         }
         else
         {
-            if (is_greater_than_f(a.x, b.x)) return true;
+            if (a.x > b.x) return true;
         }
         return false;
     });
@@ -180,17 +231,17 @@ auto dc_cp_alg(vector<POINT_2D> &in_P2D_vec)
     my_sorting::merge_sort<POINT_2D>(p_y, my_sorting::SORTING_ORDER::ASC, [](const POINT_2D& a, const POINT_2D& b, my_sorting::SORTING_ORDER sort_ord){
         if (sort_ord == my_sorting::SORTING_ORDER::ASC)
         {
-            if (is_less_than_f(a.y, b.y)) return true;
+            if (a.y < b.y) return true;
         }
         else
         {
-            if (is_greater_than_f(a.y, b.y)) return true;
+            if (a.y > b.y) return true;
         }
         return false;
     });
 
     // Recursive part
-    auto rec_part = [](const auto &self, const auto& find_split_pair, auto &p_x, auto &p_y) {
+    auto rec_part = [](const auto &self, const auto& find_split_pair,const auto &p_x,const auto &p_y) {
         // With 3 or 2 points we do brute force search
         if (p_x.size() <= 3)
         {
@@ -200,7 +251,7 @@ auto dc_cp_alg(vector<POINT_2D> &in_P2D_vec)
         // Create left and right half
         std::vector<POINT_2D> q_x, q_y;
         std::vector<POINT_2D> r_x, r_y;
-        int i=0;
+        size_t i=0;
         auto p_x_it = p_x.cbegin();
         auto p_y_it = p_y.cbegin();
         
@@ -228,14 +279,14 @@ auto dc_cp_alg(vector<POINT_2D> &in_P2D_vec)
         auto d1 = 0.0;
         auto d2 = 0.0;
 
-        if (left_pairs->size() > 0)
+        if (left_pairs.size() > 0)
         {
-            d1 = euc_dist_p2d(*(left_pairs->begin()));
+            d1 = euc_dist_p2d(*(left_pairs.begin()));
         }
 
-        if (right_pairs->size() > 0)
+        if (right_pairs.size() > 0)
         {
-            d2 = euc_dist_p2d(*(right_pairs->begin()));
+            d2 = euc_dist_p2d(*(right_pairs.begin()));
         }
 
         // If d1 or d2 can not be 0
@@ -245,42 +296,42 @@ auto dc_cp_alg(vector<POINT_2D> &in_P2D_vec)
         auto dm = std::min(d1, d2);
 
         // Find split pairs if needed
-        auto split_pairs = find_split_pair(p_x, p_y, q_x, dm);
+        auto split_pairs = find_split_pair(p_y, q_x, dm);
 
-        if (split_pairs->size() > 0) {
-            auto dsps = euc_dist_p2d(split_pairs->begin()->first, split_pairs->begin()->second);
+        if (split_pairs.size() > 0) {
+            auto dsps = euc_dist_p2d(*(split_pairs.begin()));
             if (are_equal_d(dsps,d1)) {
-                for (auto pp : *left_pairs)
+                for (auto pp : left_pairs)
                 {
-                    split_pairs->push_back(pp);
+                    split_pairs.push_back(pp);
                 }
             }
 
             if (are_equal_d(dsps,d2)) {
-                for (auto pp : *right_pairs)
+                for (auto pp : right_pairs)
                 {
-                    split_pairs->push_back(pp);
+                    split_pairs.push_back(pp);
                 }
             }
 
-            return std::move(split_pairs);
+            return split_pairs;
         }
 
         if (are_equal_d(d2,d1))
         {
-            for (auto pp : *left_pairs)
+            for (auto pp : left_pairs)
             {
-                right_pairs->push_back(std::pair<POINT_2D,POINT_2D>({POINT_2D(pp.first), POINT_2D(pp.second)}));
+                right_pairs.push_back(PO2DPS({POINT_2D(pp.first), POINT_2D(pp.second)}));
             }
         }
 
-        if (is_less_than_d(d1,d2)) return std::move(left_pairs);
+        if (is_less_than_d(d1,d2)) return left_pairs;
 
-        return std::move(right_pairs);
+        return right_pairs;
     };
 
 
-    auto find_split_pair = [](auto &p_x, auto &p_y, auto &q_x, const auto& dm) {
+    auto find_split_pair = [](const auto &p_y,const auto &q_x, const auto& dm) {
         
         // Point having the biggest x-coordinate in the first half of P
         POINT_2D p_qx = *(--(q_x.end()));
@@ -293,14 +344,14 @@ auto dc_cp_alg(vector<POINT_2D> &in_P2D_vec)
             if ((is_greater_than_f(p.x, r_a) || are_equal_f(p.x, r_a)) && (is_less_than_f(p.x, r_b) || are_equal_f(p.x, r_b))) s_y.push_back(POINT_2D(p));
         }
 
-        int sy_size = s_y.size();
+        size_t sy_size = s_y.size();
 
         auto cur_min_dist = dm;
-        std::unordered_map<double, std::vector<std::pair<POINT_2D, POINT_2D>>> map_dist_list_of_pairs;
-        auto out_split_pairs = std::make_unique<std::vector<std::pair<POINT_2D, POINT_2D>>>();
+        std::unordered_map<double, std::vector<PO2DPS>> map_dist_list_of_pairs;
+        auto out_split_pairs = std::vector<PO2DPS>();
 
-        for (int i=0; i < sy_size; i++) {
-            for (int j=0; j < std::min(7, sy_size-i); j++)
+        for (size_t i=0; i < sy_size; i++) {
+            for (size_t j=0; j < std::min((size_t)7, sy_size-i); j++)
             {
                 if (s_y[i] == s_y[i+j]) continue;
                 auto d_pij = euc_dist_p2d(s_y[i], s_y[i+j]);
@@ -315,7 +366,7 @@ auto dc_cp_alg(vector<POINT_2D> &in_P2D_vec)
 
                     if (map_dist_list_of_pairs.find(cur_min_dist) == map_dist_list_of_pairs.end())
                     {
-                        map_dist_list_of_pairs[cur_min_dist] = std::vector<std::pair<POINT_2D, POINT_2D>>{};
+                        map_dist_list_of_pairs[cur_min_dist] = std::vector<PO2DPS>{};
                     }
                     map_dist_list_of_pairs[cur_min_dist].push_back(std::make_pair<POINT_2D,POINT_2D>(POINT_2D(s_y[i]), POINT_2D(s_y[i+j])));
                 }
@@ -323,20 +374,32 @@ auto dc_cp_alg(vector<POINT_2D> &in_P2D_vec)
         }
 
         if (map_dist_list_of_pairs.find(cur_min_dist) != map_dist_list_of_pairs.cend()) {
-            out_split_pairs->clear();
-            out_split_pairs->resize(map_dist_list_of_pairs[cur_min_dist].size());
-            std::copy(map_dist_list_of_pairs[cur_min_dist].begin(), map_dist_list_of_pairs[cur_min_dist].end(), out_split_pairs->begin());
+            out_split_pairs.clear();
+            out_split_pairs.resize(map_dist_list_of_pairs[cur_min_dist].size());
+            std::copy(map_dist_list_of_pairs[cur_min_dist].begin(), map_dist_list_of_pairs[cur_min_dist].end(), out_split_pairs.begin());
         }
 
-        return std::move(out_split_pairs);
+        return out_split_pairs;
     };
 
-    
-    return std::move(rec_part(rec_part, find_split_pair, p_x, p_y));
+    auto rec_part_res = rec_part(rec_part, find_split_pair, p_x, p_y);
+    // The does use the hash of the item and the equality test to check if the item is already in the set 
+    std::unordered_set<PO2DPS, PAIR_OF_POINT_2D_HASHER, PAIR_OF_POINT_2D_EQUALITY> cp_set;
+    for (auto pp : rec_part_res)
+    {
+        cp_set.insert(std::make_pair<POINT_2D,POINT_2D>(POINT_2D(pp.first), POINT_2D(pp.second)));
+    }
+
+    for (auto pp : cp_set)
+    {
+        out_closest_pairs.push_back(std::make_pair<POINT_2D,POINT_2D>(POINT_2D(pp.first), POINT_2D(pp.second)));
+    }
+
+    return out_closest_pairs;
 }
 
 // Helper fuction used to print a vector of point pairs
-void print_list_of_points_pairs(const std::vector<std::pair<POINT_2D, POINT_2D>>& list_of_closest_pairs)
+void print_list_of_points_pairs(const std::vector<PO2DPS>& list_of_closest_pairs)
 {
     if (list_of_closest_pairs.size() < 1) cout << "No closest pairs found" << std::endl;
     else {
@@ -350,9 +413,10 @@ void print_list_of_points_pairs(const std::vector<std::pair<POINT_2D, POINT_2D>>
     }
 }
 
-int main(int argc, char**argv)
+int main(/*int argc, char**argv*/)
 {
-    auto num_ele = 10, min_ele = -10, max_ele = 10;
+    size_t num_ele = 10;
+    int min_ele = -10, max_ele = 10;
     
     std::unordered_set<POINT_2D, POINT_2D_HASHER> in_2D_unoset;
     std::random_device rndev;
@@ -363,14 +427,12 @@ int main(int argc, char**argv)
         in_2D_unoset.insert(POINT_2D(dist(rng_alg), dist(rng_alg)));
     }
 
-    auto in_2D_vec = std::vector<POINT_2D>(in_2D_unoset.begin(), in_2D_unoset.end());
-    // auto in_2D_vec = std::vector<POINT_2D>({POINT_2D{-8,3}, POINT_2D{-4,-10}, POINT_2D{-3,-8}, 
+    //auto in_2D_vec = std::vector<POINT_2D>(in_2D_unoset.begin(), in_2D_unoset.end());
+    // auto in_2D_vec = std::vector<POINT_2D>({POINT_2D{-4,6}, POINT_2D{-4,-10}, POINT_2D{-3,-8}, 
     //                                         POINT_2D{10,3}, POINT_2D{3,4}, POINT_2D{5,10}, POINT_2D{8,2}, 
     //                                         POINT_2D{-3,6}, POINT_2D{5,-1}, POINT_2D{4,-5} });
 
-    /*std::generate(in_2D_vec.begin(), in_2D_vec.end(), [&rng_alg, &dist, &in_2D_vec](){
-        return POINT_2D(dist(rng_alg), dist(rng_alg));
-    });*/  
+    auto in_2D_vec = std::vector<POINT_2D>{POINT_2D{-1,-10},POINT_2D{-3,-5},POINT_2D{-5,-8},POINT_2D{10,-3},POINT_2D{-6,5},POINT_2D{-2,-10},POINT_2D{-10,-4},POINT_2D{8,-10},POINT_2D{-5,5},POINT_2D{8,-9}};
 
     cout << "Generated 2D points : ";
     print_vec(in_2D_vec);
@@ -382,7 +444,7 @@ int main(int argc, char**argv)
     auto t1 = high_resolution_clock::now();
     auto dt = duration_cast<milliseconds>(t1-t0);
     cout << "Execution took "<< dt.count() << " ms" << std::endl;
-    print_list_of_points_pairs(*bf_cps_found);
+    print_list_of_points_pairs(bf_cps_found);
     
     
     cout << "Applying divide and conquer method..." << std::endl;
@@ -391,7 +453,7 @@ int main(int argc, char**argv)
     t1 = high_resolution_clock::now();
     dt = duration_cast<milliseconds>(t1-t0);
     cout << "Execution took "<< dt.count() << " ms" << std::endl;
-    print_list_of_points_pairs(*rec_cps_found);
+    print_list_of_points_pairs(rec_cps_found);
 
     return 0;
 }

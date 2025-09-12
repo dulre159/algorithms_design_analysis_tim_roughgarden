@@ -17,7 +17,7 @@ void show_help()
 {
     cout << "Utility to sort randomly generated integers using various sorting arlgoritms\n";
     cout << "Arguments:\n";
-    cout << "p number of integers to generate and sort - default 10\n";
+    cout << "p number of integers to generate and sort - default 10000\n";
     cout << "n minimum integer to generate - default 0\n";
     cout << "m maximum integer to generate - default 10\n";
     cout << "Example for sorting 5 integers in range [-10, 10]: program_name -p 5 -n -10 -m 10\n";
@@ -28,7 +28,7 @@ int main(int argc, char**argv)
 
     // Parse cmd args using getopt
     int c;
-    long int num_ele=10, min=0, max=10;
+    long int num_ele=10000, min=0, max=10;
     while((c = getopt(argc, argv, ":p:m:n:h")) != -1)
     {
         switch (c)

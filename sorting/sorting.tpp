@@ -15,20 +15,16 @@ namespace my_sorting {
         }
 
         T swap_helper;
-        for (int i = 0; i < input_vector.size(); i++)
-        {
-            for (int j = 0; j < input_vector.size(); j++)
-            {
-                if (compare_cb(input_vector[i], input_vector[j], order))
-                {
-                    swap_helper = input_vector[i];
-                    input_vector[i] = input_vector[j];
-                    input_vector[j] = swap_helper;
-                    
-                } 
+        
+       for (auto it1 = input_vector.begin(); it1 != input_vector.end(); it1++) {
+            for (auto it2 = input_vector.begin(); it2 != input_vector.end(); it2++) {
+                if (compare_cb(*it1, *it2, order)) {
+                    swap_helper = *it1;
+                    *it1 = *it2;
+                    *it2 = swap_helper;
+                }
             }
-
-        }
+       }
     }
 
     // Bubble sort
@@ -46,18 +42,17 @@ namespace my_sorting {
 
         bool did_swap = true;
         T swap_helper;
-        int v_size = input_vector.size();
         while(did_swap==true) {
 
             did_swap = false;
 
-            for (int i = 0; i < v_size-1; i++) 
-            {
-                if (compare_cb(input_vector[i+1], input_vector[i], order))
+            for (auto it1 = input_vector.begin(); it1 != input_vector.end()-1; it1++) {
+
+                if (compare_cb(*(it1+1), *it1, order))
                 {
-                    swap_helper = input_vector[i];
-                    input_vector[i] = input_vector[i+1];
-                    input_vector[i+1] = swap_helper;
+                    swap_helper = *it1;
+                    *it1 = *(it1+1);
+                    *(it1+1) = swap_helper;
                     did_swap = true;
                 }
             }
@@ -65,9 +60,9 @@ namespace my_sorting {
     }
 
     // Insertion sort
-    // Start from element i = 1
-    // Compare element i to element j = i-1
-    // If element i is less then element j; move element j to j+1 and place i into j
+    // Start from element with index i = 1
+    // Compare element with index i to element with index j = i-1
+    // If element with index i is less then element with index j; move element with index j to index j+1 and place elment at index i into element with index j
     template <typename T>
     void ins_sort(std::vector<T> &input_vector, SORTING_ORDER order, std::function<bool(const T&,const T&, const SORTING_ORDER sort_ord)> compare_cb)
     {
@@ -78,18 +73,16 @@ namespace my_sorting {
         }
 
         T current_selection;
-        for (int i = 1; i < input_vector.size(); i++)
+        for (auto it1 = input_vector.begin()+1; it1 != input_vector.end(); it1++)
         {
-            current_selection = input_vector[i];
-            
-            for (int j = i-1; j >= 0; j--)
+            current_selection = *it1;
+            for (auto it2 = std::make_reverse_iterator(it1-1)-1; it2 != input_vector.rend(); it2++)
             {
-                if (compare_cb(current_selection, input_vector[j], order))
+                if (compare_cb(current_selection, *it2, order))
                 {
-                    input_vector[j+1] = input_vector[j];
-                    input_vector[j] = current_selection;
+                    *(it2-1) = *it2;
+                    *it2 = current_selection;
                 }
-
             }
 
         }
@@ -125,19 +118,19 @@ namespace my_sorting {
         merge_sort(second_half, order, compare_cb);
 
         // Merge step
-        int j = 0, l = 0;
-        for (int i=0; i < in_size; i++) {
+        size_t j = 0, l = 0;
+        std::for_each(input_vector.begin(), input_vector.end(), [&j, &l, &first_half, &second_half, &compare_cb, order](T& e) {
 
             if (j < first_half.size() && l < second_half.size())
             {
                 if (compare_cb(first_half[j], second_half[l], order))
                 {
-                    input_vector[i] = first_half[j];
+                    e = first_half[j];
                     j++;
                 } 
                 else
                 {
-                    input_vector[i] = second_half[l];
+                    e = second_half[l];
                     l++;
                 }   
             }
@@ -145,16 +138,17 @@ namespace my_sorting {
             {
                 // Copy remaining elements as they are
                 if (j < first_half.size()) {
-                    input_vector[i] = first_half[j];
+                    e = first_half[j];
                     j++;
                 }
 
                 if (l < second_half.size()) {
-                    input_vector[i] = second_half[l];
+                    e = second_half[l];
                     l++;
                 }
             }
             
-        }
+        
+        });
     }
 }

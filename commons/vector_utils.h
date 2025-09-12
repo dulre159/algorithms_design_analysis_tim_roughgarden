@@ -2,34 +2,28 @@
 
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 using std::cout;
 using std::vector;
 
 /* Vector pretty printing */
 template<class T>
-void print_vec(vector<T> &input_vector)
+void print_vec(vector<T> &input_vector, unsigned int cut_off=100)
 {
     cout << "[ ";
 
-    if (input_vector.size() > 100)
+    if (input_vector.size() > cut_off)
     {
         // If the vector has more then 100 elements just print the first 50 and the last 50
-        for (unsigned int i=0; i < 50; i++) {
-            cout << input_vector[i] << " ";
-        }
-
+        std::for_each(input_vector.cbegin(), input_vector.cbegin()+50, [](T e){ cout << e << " ";});
         cout << "... ";
-
-        for (unsigned int i=input_vector.size()-51; i < input_vector.size(); i++) {
-            cout << input_vector[i] << " ";
-        }
+        std::for_each(input_vector.cend()-50, input_vector.cend(), [](T e){ cout << e << " ";});
     }
 
     else {
-        for (unsigned int i=0; i < input_vector.size(); i++) {
-            cout << input_vector[i] << " ";
-        }
+        // Otherwise print all the elements
+        std::for_each(input_vector.cbegin(), input_vector.cend(), [](T e){ cout << e << " ";});
     }
 
     cout << "]";
