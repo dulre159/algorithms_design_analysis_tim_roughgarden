@@ -249,27 +249,37 @@ auto dc_cp_alg(const vector<POINT_2D> &in_P2D_vec)
         }
 
         // Create left and right half
-        std::vector<POINT_2D> q_x, q_y;
-        std::vector<POINT_2D> r_x, r_y;
+        std::vector<POINT_2D> q_x, r_x, q_y, r_y;
+        std::unordered_set<POINT_2D, POINT_2D_HASHER> q_x_set;
+        std::unordered_set<POINT_2D, POINT_2D_HASHER> r_x_set;
         size_t i=0;
         auto p_x_it = p_x.cbegin();
-        auto p_y_it = p_y.cbegin();
         
         while(p_x_it != p_x.cend())
         {
 
             if (i < p_x.size()/2) {
                 q_x.push_back(POINT_2D(*p_x_it));
-                q_y.push_back(POINT_2D(*p_y_it));
+                q_x_set.insert(POINT_2D(*p_x_it));
             }
             else {
                 r_x.push_back(POINT_2D(*p_x_it));
-                r_y.push_back(POINT_2D(*p_y_it));
+                r_x_set.insert(POINT_2D(*p_x_it));
             }
 
             p_x_it++;
-            p_y_it++;
             i++;
+        }
+        
+        // Create q_y and r_y
+        for (const auto& pt : p_y)
+        {
+            // Point *p_y_it is either in q_x or r_x
+            if (q_x_set.count(pt)) {
+                q_y.push_back(pt);
+            } else {
+                r_y.push_back(pt);
+            }
         }
 
         // Recurse
@@ -415,8 +425,8 @@ void print_list_of_points_pairs(const std::vector<PO2DPS>& list_of_closest_pairs
 
 int main(/*int argc, char**argv*/)
 {
-    size_t num_ele = 10;
-    int min_ele = -10, max_ele = 10;
+    size_t num_ele = 20000;
+    int min_ele = -100, max_ele = 100;
     
     std::unordered_set<POINT_2D, POINT_2D_HASHER> in_2D_unoset;
     std::random_device rndev;
@@ -427,12 +437,13 @@ int main(/*int argc, char**argv*/)
         in_2D_unoset.insert(POINT_2D(dist(rng_alg), dist(rng_alg)));
     }
 
-    //auto in_2D_vec = std::vector<POINT_2D>(in_2D_unoset.begin(), in_2D_unoset.end());
+    auto in_2D_vec = std::vector<POINT_2D>(in_2D_unoset.begin(), in_2D_unoset.end());
     // auto in_2D_vec = std::vector<POINT_2D>({POINT_2D{-4,6}, POINT_2D{-4,-10}, POINT_2D{-3,-8}, 
     //                                         POINT_2D{10,3}, POINT_2D{3,4}, POINT_2D{5,10}, POINT_2D{8,2}, 
     //                                         POINT_2D{-3,6}, POINT_2D{5,-1}, POINT_2D{4,-5} });
 
-    auto in_2D_vec = std::vector<POINT_2D>{POINT_2D{-1,-10},POINT_2D{-3,-5},POINT_2D{-5,-8},POINT_2D{10,-3},POINT_2D{-6,5},POINT_2D{-2,-10},POINT_2D{-10,-4},POINT_2D{8,-10},POINT_2D{-5,5},POINT_2D{8,-9}};
+    
+    //auto in_2D_vec = std::vector<POINT_2D>{POINT_2D{-1,-10},POINT_2D{-3,-5},POINT_2D{-5,-8},POINT_2D{10,-3},POINT_2D{-6,5},POINT_2D{-2,-10},POINT_2D{-10,-4},POINT_2D{8,-10},POINT_2D{-5,5},POINT_2D{8,-9}};
 
     cout << "Generated 2D points : ";
     print_vec(in_2D_vec);
@@ -444,7 +455,7 @@ int main(/*int argc, char**argv*/)
     auto t1 = high_resolution_clock::now();
     auto dt = duration_cast<milliseconds>(t1-t0);
     cout << "Execution took "<< dt.count() << " ms" << std::endl;
-    print_list_of_points_pairs(bf_cps_found);
+    //print_list_of_points_pairs(bf_cps_found);
     
     
     cout << "Applying divide and conquer method..." << std::endl;
@@ -453,7 +464,7 @@ int main(/*int argc, char**argv*/)
     t1 = high_resolution_clock::now();
     dt = duration_cast<milliseconds>(t1-t0);
     cout << "Execution took "<< dt.count() << " ms" << std::endl;
-    print_list_of_points_pairs(rec_cps_found);
+    //print_list_of_points_pairs(rec_cps_found);
 
     return 0;
 }
