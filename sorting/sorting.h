@@ -2,6 +2,8 @@
 #include <functional>
 #include <iostream>
 #include <iterator>
+#include <algorithm>
+#include <random>
 
 namespace my_sorting {
 
@@ -22,6 +24,8 @@ namespace my_sorting {
     template <typename T>
     void merge_sort(std::vector<T> &input_vector, SORTING_ORDER order, std::function<bool(const T&,const T&, const SORTING_ORDER sort_ord)> compare_cb);
 
+    template <typename T>
+    void quick_sort(std::vector<T> &input_vector, SORTING_ORDER order, std::function<bool(const T&,const T&, const SORTING_ORDER sort_ord)> compare_cb);
 }
 
 #include "sorting.tpp"

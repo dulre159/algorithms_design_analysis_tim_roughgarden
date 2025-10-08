@@ -48,7 +48,7 @@ namespace my_sorting {
 
             for (auto it1 = input_vector.begin(); it1 != input_vector.end()-1; it1++) {
 
-                if (compare_cb(*(it1+1), *it1, order))
+                if (((*(it1+1)) != (*it1)) && compare_cb(*(it1+1), *it1, order))
                 {
                     swap_helper = *it1;
                     *it1 = *(it1+1);
@@ -150,5 +150,87 @@ namespace my_sorting {
             
         
         });
+    }
+
+
+    // Quick sort
+    // Choose a pivot element L randomly
+    // Divid the input array in two parts P1 and P2
+    // P1 contains the elements that are less then L and P2 contains the elements that are greater then L
+    // Recurse on P1 and P2
+    // Avrage running time of O(nlogn)
+    // Not better then merge sort if the input has many repeated elements
+    template <typename T>
+    void quick_sort(std::vector<T> &input_vector, SORTING_ORDER order, std::function<bool(const T&,const T&, const SORTING_ORDER sort_ord)> compare_cb)
+    {
+
+        if (!compare_cb)
+        {
+            std::cout << "Comparison callback is needed\n";
+            return;
+        }
+
+        std::mt19937 rndg_alg{std::random_device{}()};
+
+        auto select_pivot = [&rndg_alg](auto it_begin, auto it_end){
+            // Pivot selection is random; the hope is to get half of the time a reasonable split
+            int d = std::distance(it_begin, it_end);
+            std::uniform_int_distribution rnd_idis(0, d-1);
+            int rnd_n = rnd_idis(rndg_alg);
+            // std::cout << "d: " << d << " rn*d_n: "<< rnd_n << std::endl;
+            return it_begin+rnd_n;
+        };
+
+        auto partition_around_pivot = [](auto pivot_it, auto it_begin, auto it_end, SORTING_ORDER order, auto& compare_cb){
+            
+            auto pivot_val = *pivot_it;
+            std::iter_swap(it_begin, pivot_it);
+            auto split_point = it_begin+1;
+
+            // std::cout << "[ ";
+            // for(auto it1 = it_begin; it1 != it_end; it1++) std::cout << *it1 << " ";
+            // std::cout << "]" << std::endl;
+
+            for (auto it=it_begin+1; it != it_end; it++)
+            {   
+                if (compare_cb(*it, pivot_val, order))
+                {
+                    std::iter_swap(split_point, it);
+                    split_point++;
+
+                    // std::cout << "[ ";
+                    // for(auto it1 = it_begin; it1 != it_end; it1++) std::cout << *it1 << " ";
+                    // std::cout << "]" << std::endl;
+                }
+            }
+            std::iter_swap(split_point-1, it_begin);
+
+            // std::cout << "[ ";
+            // for(auto it = it_begin; it != it_end; it++) std::cout << *it << " ";
+            // std::cout << "]" << std::endl;
+
+            return split_point-1;
+        };
+
+        auto rec_part = [](const auto& self, const auto& part_fun, const auto& sel_pivot_fun, auto it_begin, auto it_end, SORTING_ORDER order, auto& compare_cb) {
+            auto in_size = std::distance(it_begin, it_end);
+            
+            if (in_size <= 1) return;
+            
+            // std::cout << "[ ";
+            // for(auto it = it_begin; it != it_end; it++) std::cout << *it << " ";
+            // std::cout << "]" << std::endl;
+
+            auto pivot_it = sel_pivot_fun(it_begin, it_end);
+
+            // std::cout << "Selected pivot " << *pivot_it << std::endl;
+
+            auto split_point = part_fun(pivot_it, it_begin, it_end, order, compare_cb);
+
+            self(self, part_fun, sel_pivot_fun, it_begin, split_point, order, compare_cb);
+            self(self, part_fun, sel_pivot_fun, split_point+1, it_end, order, compare_cb);
+        };
+
+        rec_part(rec_part, partition_around_pivot, select_pivot, input_vector.begin(), input_vector.end(), order, compare_cb);
     }
 }

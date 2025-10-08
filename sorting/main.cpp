@@ -28,7 +28,7 @@ int main(int argc, char**argv)
 
     // Parse cmd args using getopt
     int c;
-    long int num_ele=10000, min=0, max=10;
+    long int num_ele=15000, min=0, max=10;
     while((c = getopt(argc, argv, ":p:m:n:h")) != -1)
     {
         switch (c)
@@ -73,23 +73,25 @@ int main(int argc, char**argv)
         return uniform_int_dist(rng);
     });
 
-    cout << "Unsorted vector: ";
-    print_vec(unsorted_vector);
-    cout << "\n";
-
-    cout << "Applying selection sort..." << "\n";
-    auto t1 = high_resolution_clock::now();
-    my_sorting::sel_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC, [](const int& x,const int& y, const my_sorting::SORTING_ORDER sort_ord) -> bool {
+    auto sort_cb_fun = [](const int& x,const int& y, const my_sorting::SORTING_ORDER sort_ord) -> bool {
         if (sort_ord == my_sorting::SORTING_ORDER::ASC)
         {
-            if (x < y) return true;
+            if (x <= y) return true;
         }
         else
         {
             if (x > y) return true;
         }
         return false;
-    });
+    };
+
+    cout << "Unsorted vector: ";
+    print_vec(unsorted_vector);
+    cout << "\n";
+
+    cout << "Applying selection sort..." << "\n";
+    auto t1 = high_resolution_clock::now();
+    my_sorting::sel_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC, sort_cb_fun);
     auto t2 = high_resolution_clock::now();
 
     milliseconds ms_int = duration_cast<milliseconds>(t2 - t1);
@@ -107,17 +109,7 @@ int main(int argc, char**argv)
 
     cout << "Applying insertion sort..." << "\n";
     t1 = high_resolution_clock::now();
-    my_sorting::ins_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC, [](const int& x,const int& y, const my_sorting::SORTING_ORDER sort_ord) -> bool {
-        if (sort_ord == my_sorting::SORTING_ORDER::ASC)
-        {
-            if (x < y) return true;
-        }
-        else
-        {
-            if (x > y) return true;
-        }
-        return false;
-    });
+    my_sorting::ins_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC, sort_cb_fun);
     t2 = high_resolution_clock::now();
 
     ms_int = duration_cast<milliseconds>(t2 - t1);
@@ -135,17 +127,7 @@ int main(int argc, char**argv)
 
     cout << "Applying bubble sort..." << "\n";
     t1 = high_resolution_clock::now();
-    my_sorting::bubble_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC,[](const int& x,const int& y, const my_sorting::SORTING_ORDER sort_ord) -> bool {
-        if (sort_ord == my_sorting::SORTING_ORDER::ASC)
-        {
-            if (x < y) return true;
-        }
-        else
-        {
-            if (x > y) return true;
-        }
-        return false;
-    });
+    my_sorting::bubble_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC,sort_cb_fun);
     t2 = high_resolution_clock::now();
 
     ms_int = duration_cast<milliseconds>(t2 - t1);
@@ -163,22 +145,30 @@ int main(int argc, char**argv)
 
     cout << "Applying merge sort..." << "\n";
     t1 = high_resolution_clock::now();
-    my_sorting::merge_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC, [](const int& x,const int& y, const my_sorting::SORTING_ORDER sort_ord) -> bool {
-        if (sort_ord == my_sorting::SORTING_ORDER::ASC)
-        {
-            if (x < y) return true;
-        }
-        else
-        {
-            if (x > y) return true;
-        }
-        return false;
-    });
+    my_sorting::merge_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC, sort_cb_fun);
     t2 = high_resolution_clock::now();
 
     ms_int = duration_cast<milliseconds>(t2 - t1);
 
     cout << "Vector after merge sort[ execution time: "<< ms_int.count() <<" ms ]: ";
+    print_vec(unsorted_vector);
+    cout << "\n";
+
+    cout << "Unsorting vector..." << "\n";
+    std::shuffle(unsorted_vector.begin(), unsorted_vector.end(), rng);
+
+    cout << "Unsorted vector: ";
+    print_vec(unsorted_vector);
+    cout << "\n";
+
+    cout << "Applying quick sort..." << "\n";
+    t1 = high_resolution_clock::now();
+    my_sorting::quick_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC, sort_cb_fun);
+    t2 = high_resolution_clock::now();
+
+    ms_int = duration_cast<milliseconds>(t2 - t1);
+
+    cout << "Vector after quick sort[ execution time: "<< ms_int.count() <<" ms ]: ";
     print_vec(unsorted_vector);
     cout << "\n";
 
