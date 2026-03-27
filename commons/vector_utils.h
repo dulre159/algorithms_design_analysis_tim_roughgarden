@@ -9,9 +9,9 @@ using std::vector;
 
 /* Vector pretty printing */
 template<class T>
-void print_vec(vector<T> &input_vector, unsigned int cut_off=100)
+void print_vec(vector<T> &input_vector, std::string name = "", unsigned int cut_off=100)
 {
-    cout << "[ ";
+    cout << name << ((name.length() > 0) ? ":" : "") << "[ ";
 
     if (input_vector.size() > cut_off)
     {
@@ -26,5 +26,5 @@ void print_vec(vector<T> &input_vector, unsigned int cut_off=100)
         std::for_each(input_vector.cbegin(), input_vector.cend(), [](T e){ cout << e << " ";});
     }
 
-    cout << "]";
+    cout << "]" << std::endl;
 }

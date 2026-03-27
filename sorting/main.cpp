@@ -1,17 +1,13 @@
-#include "main.h"
+#include "sorting.h"
+#include "../commons/vector_utils.h"
+#include "../commons/commons.h"
 #include <unistd.h>
 #include <iostream>
 #include <string>
-#include <chrono>
 #include <random>
 
 using std::cout;
 using std::vector;
-/* Stuff to measure execution time */
-using std::chrono::high_resolution_clock;
-using std::chrono::duration_cast;
-using std::chrono::duration;
-using std::chrono::milliseconds;
 
 void show_help()
 {
@@ -85,92 +81,58 @@ int main(int argc, char**argv)
         return false;
     };
 
-    cout << "Unsorted vector: ";
-    print_vec(unsorted_vector);
-    cout << "\n";
+    print_vec(unsorted_vector, "Input unsorted vector");
 
     cout << "Applying selection sort..." << "\n";
-    auto t1 = high_resolution_clock::now();
-    my_sorting::sel_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC, sort_cb_fun);
-    auto t2 = high_resolution_clock::now();
-
-    milliseconds ms_int = duration_cast<milliseconds>(t2 - t1);
-
-    cout << "Vector after selection sort[ execution time: "<< ms_int.count() <<" ms ]: ";
-    print_vec(unsorted_vector);
-    cout << "\n";
+    {
+        ExecutionTimerMs execTimer("Selection Sort Function");
+        my_sorting::sel_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC, sort_cb_fun);
+    }
+    print_vec(unsorted_vector, "Sorted vector");
 
     cout << "Unsorting vector..." << "\n";
     std::shuffle(unsorted_vector.begin(), unsorted_vector.end(), rng);
-
-    cout << "Unsorted vector: ";
-    print_vec(unsorted_vector);
-    cout << "\n";
+    print_vec(unsorted_vector, "Unsorted vector");
 
     cout << "Applying insertion sort..." << "\n";
-    t1 = high_resolution_clock::now();
-    my_sorting::ins_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC, sort_cb_fun);
-    t2 = high_resolution_clock::now();
-
-    ms_int = duration_cast<milliseconds>(t2 - t1);
-
-    cout << "Vector after insertion sort[ execution time: "<< ms_int.count() <<" ms ]: ";
-    print_vec(unsorted_vector);
-    cout << "\n";
+    {
+        ExecutionTimerMs execTimer("Selection Sort Function");
+        my_sorting::ins_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC, sort_cb_fun);
+    }
+    print_vec(unsorted_vector, "Sorted vector");
 
     cout << "Unsorting vector..." << "\n";
     std::shuffle(unsorted_vector.begin(), unsorted_vector.end(), rng);
-
-    cout << "Unsorted vector: ";
-    print_vec(unsorted_vector);
-    cout << "\n";
+    print_vec(unsorted_vector, "Unsorted vector");
 
     cout << "Applying bubble sort..." << "\n";
-    t1 = high_resolution_clock::now();
-    my_sorting::bubble_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC,sort_cb_fun);
-    t2 = high_resolution_clock::now();
-
-    ms_int = duration_cast<milliseconds>(t2 - t1);
-
-    cout << "Vector after bubble sort[ execution time: "<< ms_int.count() <<" ms ]: ";
-    print_vec(unsorted_vector);
-    cout << "\n";
+    {
+        ExecutionTimerMs execTimer("Selection Sort Function");
+        my_sorting::bubble_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC,sort_cb_fun);
+    }
+    print_vec(unsorted_vector, "Sorted vector");
 
     cout << "Unsorting vector..." << "\n";
     std::shuffle(unsorted_vector.begin(), unsorted_vector.end(), rng);
-
-    cout << "Unsorted vector: ";
-    print_vec(unsorted_vector);
-    cout << "\n";
+    print_vec(unsorted_vector, "Unsorted vector");
 
     cout << "Applying merge sort..." << "\n";
-    t1 = high_resolution_clock::now();
-    my_sorting::merge_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC, sort_cb_fun);
-    t2 = high_resolution_clock::now();
-
-    ms_int = duration_cast<milliseconds>(t2 - t1);
-
-    cout << "Vector after merge sort[ execution time: "<< ms_int.count() <<" ms ]: ";
-    print_vec(unsorted_vector);
-    cout << "\n";
+    {
+        ExecutionTimerMs execTimer("Selection Sort Function");
+        my_sorting::merge_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC, sort_cb_fun);
+    }
+    print_vec(unsorted_vector, "Sorted vector");
 
     cout << "Unsorting vector..." << "\n";
     std::shuffle(unsorted_vector.begin(), unsorted_vector.end(), rng);
-
-    cout << "Unsorted vector: ";
-    print_vec(unsorted_vector);
-    cout << "\n";
+    print_vec(unsorted_vector, "Unsorted vector");
 
     cout << "Applying quick sort..." << "\n";
-    t1 = high_resolution_clock::now();
-    my_sorting::quick_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC, sort_cb_fun);
-    t2 = high_resolution_clock::now();
-
-    ms_int = duration_cast<milliseconds>(t2 - t1);
-
-    cout << "Vector after quick sort[ execution time: "<< ms_int.count() <<" ms ]: ";
-    print_vec(unsorted_vector);
-    cout << "\n";
+    {
+        ExecutionTimerMs execTimer("Selection Sort Function");
+        my_sorting::quick_sort<int>(unsorted_vector, my_sorting::SORTING_ORDER::ASC, sort_cb_fun);
+    }
+    print_vec(unsorted_vector, "Sorted vector");
 
     return 0;
 }

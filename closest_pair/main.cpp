@@ -445,26 +445,24 @@ int main(/*int argc, char**argv*/)
     
     //auto in_2D_vec = std::vector<POINT_2D>{POINT_2D{-1,-10},POINT_2D{-3,-5},POINT_2D{-5,-8},POINT_2D{10,-3},POINT_2D{-6,5},POINT_2D{-2,-10},POINT_2D{-10,-4},POINT_2D{8,-10},POINT_2D{-5,5},POINT_2D{8,-9}};
 
-    cout << "Generated 2D points : ";
-    print_vec(in_2D_vec);
-    cout << "\n";
+    print_vec(in_2D_vec, "Input 2D points vector");
+
+    std::vector<PO2DPS> bf_cps_found, rec_cps_found;
 
     cout << "Applying bruteforce method..." << std::endl;
-    auto t0 = high_resolution_clock::now();
-    auto bf_cps_found = bf_cp_alg(in_2D_vec);
-    auto t1 = high_resolution_clock::now();
-    auto dt = duration_cast<milliseconds>(t1-t0);
-    cout << "Execution took "<< dt.count() << " ms" << std::endl;
-    //print_list_of_points_pairs(bf_cps_found);
+    {
+        ExecutionTimerMs execTimer("Bruteforce CP Function");
+        bf_cps_found = bf_cp_alg(in_2D_vec);
+    }
+    print_list_of_points_pairs(bf_cps_found);
     
     
-    cout << "Applying divide and conquer method..." << std::endl;
-    t0 = high_resolution_clock::now();
-    auto rec_cps_found = dc_cp_alg(in_2D_vec);
-    t1 = high_resolution_clock::now();
-    dt = duration_cast<milliseconds>(t1-t0);
-    cout << "Execution took "<< dt.count() << " ms" << std::endl;
-    //print_list_of_points_pairs(rec_cps_found);
+    cout << "Applying recursive method..." << std::endl;
+    {
+        ExecutionTimerMs execTimer("Recursive CP Function");
+        rec_cps_found = dc_cp_alg(in_2D_vec);
+    }
+    print_list_of_points_pairs(rec_cps_found);
 
     return 0;
 }

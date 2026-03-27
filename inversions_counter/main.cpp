@@ -1,19 +1,14 @@
 #include "../commons/vector_utils.h"
+#include "../commons/commons.h"
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
 #include <string>
-#include <chrono>
 #include <random>
 #include <algorithm>
 
 using std::cout;
 using std::vector;
-/* Stuff to measure execution time */
-using std::chrono::high_resolution_clock;
-using std::chrono::duration_cast;
-using std::chrono::duration;
-using std::chrono::milliseconds;
 
 /* 
     Brute-force inversions counter 
@@ -90,12 +85,13 @@ void recursive_inv_cnt(vector<int> &input_vector, unsigned int &tot_invs)
     });
 
 }
-    //vector<int> in_vec = {1, 3, 5, 2, 4, 6};
-    //vector<int> in_vec = {6,5,4,3,2,1};
+    
 int main(/*int argc, char**argv*/)
 {
     unsigned int inversions_counter = 0;
     int min = 0, max = 1000, num_ele = 10000;
+    //vector<int> in_vec = {1, 3, 5, 2, 4, 6};
+    //vector<int> in_vec = {6,5,4,3,2,1};
     vector<int> in_vec (num_ele);
     
     std::random_device rdev;
@@ -106,30 +102,23 @@ int main(/*int argc, char**argv*/)
         return dist(rng_alg);
     });
 
-    cout << "Vector: ";
-    print_vec(in_vec);
-    cout << "\n";
+    print_vec(in_vec, "Input Vector");
 
     cout << "Counting inversions with brute force method..." << "\n";
-
-    auto t1 = high_resolution_clock::now();
-    brute_inv_cnt(in_vec, inversions_counter);
-    auto t2 = high_resolution_clock::now();
-    
-    milliseconds ms_int = duration_cast<milliseconds>(t2 - t1);
-    cout << "Execution time(ms): " << ms_int.count() << "\n";
+    {
+        ExecutionTimerMs timer_("Brute-force Inversions Counter Function");
+        brute_inv_cnt(in_vec, inversions_counter);
+    }
 
     cout << "Total number of inversions found: " << inversions_counter << "\n";
 
     inversions_counter = 0;
 
     cout << "Recursively counting inversions..." << "\n";
-    t1 = high_resolution_clock::now();
-    recursive_inv_cnt(in_vec, inversions_counter);
-    t2 = high_resolution_clock::now();
-
-    ms_int = duration_cast<milliseconds>(t2 - t1);
-    cout << "Execution time(ms): " << ms_int.count() << "\n";
+    {
+        ExecutionTimerMs timer_("Recursive Inversions Counter Function");
+        recursive_inv_cnt(in_vec, inversions_counter);
+    }
 
     cout << "Total number of inversions found: " << inversions_counter << "\n";
 

@@ -1,8 +1,8 @@
+#include "../commons/commons.h"
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
 #include <string>
-#include <chrono>
 
 using std::cout;
 using std::string;
@@ -10,15 +10,11 @@ using std::to_string;
 using std::tuple;
 using std::get;
 using std::min;
-/* Stuff to measure execution time */
-using std::chrono::high_resolution_clock;
-using std::chrono::duration_cast;
-using std::chrono::duration;
-using std::chrono::milliseconds;
 
 // Multiplication without recursion
 unsigned int basic_integer_mul(unsigned int x, unsigned int y)
 {
+    /*TODO*/
     return x*y;
 }
 
@@ -138,52 +134,27 @@ unsigned int karatsuba_integer_mul(unsigned int x, unsigned int y)
 
 int main(int /*argc*/, char** /*argv*/)
 {   
-    /*srand(time(0));
-    uint min = 1000, max = 100000;
-    for (int i=0; i <1000; i++)
-    {
-
-        unsigned int a = (rand()%max)+min, b = (rand()%max)+min;
-
-        unsigned int b_mul_res = basic_integer_mul(a,b);
-        unsigned int rec_mul_res = recursive_integer_mul(a,b);
-        unsigned int kartsuba_mul_res = karatsuba_integer_mul(a,b);
-
-        cout << "Basic mul: "<< a << "x" << b << " = " << b_mul_res<< "\n";
-        cout << "Recursive mul: "<< a << "x" << b << " = " << rec_mul_res << "\n";
-        cout << "Karatsuba mul: "<< a << "x" << b << " = " << kartsuba_mul_res << "\n";
-
-        if (b_mul_res != rec_mul_res)
-        {
-            cout << "Failed recursive mul...";
-            break;
-        }
-
-    }*/
-
     unsigned int a = 123459999, b = 7896349;
 
-    auto t1 = high_resolution_clock::now();
-    unsigned int b_mul_res = basic_integer_mul(a,b);
-    auto t2 = high_resolution_clock::now();
-    auto ms_int = duration_cast<milliseconds>(t2 - t1);
-    unsigned int bmt = ms_int.count();
+    unsigned int b_mul_res = 0, rec_mul_res = 0, kartsuba_mul_res = 0;
+    {
+        ExecutionTimerMs execTimer_("Basic multiplication function");
+        b_mul_res = basic_integer_mul(a,b);
+    }
 
-    t1 = high_resolution_clock::now();
-    unsigned int rec_mul_res = recursive_integer_mul(a,b);
-    t2 = high_resolution_clock::now();
-    ms_int = duration_cast<milliseconds>(t2 - t1);
-    unsigned int rmt = ms_int.count();
+    {   
+        ExecutionTimerMs execTimer_("Recursive multiplication function"); 
+        rec_mul_res = recursive_integer_mul(a,b);
+    }
 
-    t1 = high_resolution_clock::now();
-    unsigned int kartsuba_mul_res = karatsuba_integer_mul(a,b);
-    t2 = high_resolution_clock::now();
-    ms_int = duration_cast<milliseconds>(t2 - t1);
-    unsigned int kmt = ms_int.count();
+    {   
+        ExecutionTimerMs execTimer_("Karatsuba multiplication function"); 
+        kartsuba_mul_res = karatsuba_integer_mul(a,b);
+    }
 
-    cout << "Basic mul: "<< a << "x" << b << " = " << b_mul_res << " computed in "<< bmt << "ms" << "\n";
-    cout << "Recursive mul: "<< a << "x" << b << " = " << rec_mul_res << " computed in "<< rmt << "ms" << "\n";
-    cout << "Karatsuba mul: "<< a << "x" << b << " = " << kartsuba_mul_res << " computed in "<< kmt << "ms" << "\n";
+    cout << "Basic multiplication result: "<< a << "x" << b << " = " << b_mul_res << "\n";
+    cout << "Recursive multiplication result: "<< a << "x" << b << " = " << rec_mul_res << "\n";
+    cout << "Karatsuba multiplication result: "<< a << "x" << b << " = " << kartsuba_mul_res << "\n";
     
     return 0;
 }
