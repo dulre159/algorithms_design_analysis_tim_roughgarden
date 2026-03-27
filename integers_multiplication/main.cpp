@@ -9,51 +9,41 @@ using std::string;
 using std::to_string;
 using std::tuple;
 using std::get;
-using std::min;
+using std::max;
 
 // Multiplication without recursion
-unsigned int basic_integer_mul(unsigned int x, unsigned int y)
+constexpr unsigned long long basic_integer_mul(unsigned int x, unsigned int y)
 {
     /*TODO*/
-    return x*y;
+    return static_cast<unsigned long long>(x)*y;
 }
 
 // Counts number of digits in a number
-int count_num_digit(int n)
+unsigned int count_num_digit(unsigned int n)
 {
-    int ret = 0;
+    unsigned int ret = 0;
     
     if (n==0) return 1;
     
     while(n > 0) {
         n=n/10; 
         ret++;
-    };
+    }
     
     return ret;
 }
 
 // Splits number according to m
-tuple<unsigned int, unsigned int> split_num(unsigned int x, unsigned int m)
+tuple<unsigned long long, unsigned long long> split_num(unsigned int x, unsigned int m)
 {
     // Convert number in string
-    string x_string = to_string(x/pow(10, m));
-    unsigned int num_d_c = count_num_digit(x)+1;
-    string x_buff;
-    unsigned int a = 0, b = 0;
-    for (unsigned int i = 0; i < num_d_c; i++)
-    {
-        if (x_string[i]=='.') {
-            a = stoi(x_buff);
-            x_buff.clear();
-            continue;
-        }
-        x_buff.push_back(x_string[i]);
-    }
+    unsigned int power_of_10 = pow(10, m);
+    unsigned long long a = x / power_of_10;
+    unsigned long long b = x % power_of_10;
 
-    b = stoi(x_buff);
+    //std::cout << "Input " << x << " m " << m << " a " << a << " b" << b << "\n";
 
-    return tuple<unsigned int,unsigned int>{a,b};
+    return tuple<unsigned long long,unsigned long long>{a,b};
 }
 
 
@@ -65,31 +55,24 @@ tuple<unsigned int, unsigned int> split_num(unsigned int x, unsigned int m)
 // B is the base; assume B=10
 // x = (B^m)*a + b ; y = (B^m)*c + d
 // x*y = B^2m * ac + B^m * (ad+bc) + bd
-unsigned int recursive_integer_mul(unsigned int x, unsigned int y)
+unsigned long long recursive_integer_mul(unsigned int x, unsigned int y)
 {
-    unsigned int xdc = count_num_digit(x);
-    unsigned int ydc = count_num_digit(y);
-
-    unsigned int m = (int)min(xdc, ydc)-1;
-    unsigned int a = x, b = 0, c = y, d = 0;
-
-    if (m==0)
+    if (x < 10 || y < 10)
     {
         return x*y;
     }
+    
+    unsigned int xdc = count_num_digit(x);
+    unsigned int ydc = count_num_digit(y);
+    unsigned int m = max(xdc, ydc)/2;
 
-    tuple<unsigned int, unsigned int> x_halfs = split_num(x, m);
-    a = get<0>(x_halfs);
-    b = get<1>(x_halfs);
+    auto [a, b] = split_num(x, m);
+    auto [c, d] = split_num(y, m);
 
-    tuple<unsigned int, unsigned int> y_halfs = split_num(y, m);
-    c = get<0>(y_halfs);
-    d = get<1>(y_halfs);
-
-    unsigned int ac = recursive_integer_mul(a, c);
-    unsigned int ad = recursive_integer_mul(a, d);
-    unsigned int bc = recursive_integer_mul(b, c);
-    unsigned int bd = recursive_integer_mul(b, d);
+    unsigned long long ac = recursive_integer_mul(a, c);
+    unsigned long long ad = recursive_integer_mul(a, d);
+    unsigned long long bc = recursive_integer_mul(b, c);
+    unsigned long long bd = recursive_integer_mul(b, d);
 
     return (pow(10, 2*m)*ac) + (pow(10, m)*(ad + bc)) + bd;
 }
@@ -101,33 +84,26 @@ unsigned int recursive_integer_mul(unsigned int x, unsigned int y)
 // x = (10^(n/2))*a + b ; y = (10^(n/2))*c + d
 // x*y = 10^n * ac + 10^n/2 * (ad+bc) + bd
 // (ad+bc) = (a+b)(c+d) - ac - bd
-unsigned int karatsuba_integer_mul(unsigned int x, unsigned int y)
+unsigned long long karatsuba_integer_mul(unsigned int x, unsigned int y)
 {
-    unsigned int xdc = count_num_digit(x);
-    unsigned int ydc = count_num_digit(y);
-
-    unsigned int m = (int)min(xdc, ydc)-1;
-    unsigned int a = x, b = 0, c = y, d = 0;
-
-    if (m==0)
+    if (x < 10 || y < 10)
     {
         return x*y;
     }
 
-    tuple<unsigned int, unsigned int> x_halfs = split_num(x, m);
-    a = get<0>(x_halfs);
-    b = get<1>(x_halfs);
+    unsigned int xdc = count_num_digit(x);
+    unsigned int ydc = count_num_digit(y);
+    unsigned int m = max(xdc, ydc)/2;
 
-    tuple<unsigned int, unsigned int> y_halfs = split_num(y, m);
-    c = get<0>(y_halfs);
-    d = get<1>(y_halfs);
+    auto [a, b] = split_num(x, m);
+    auto [c, d] = split_num(y, m);
     
-    unsigned int ac = recursive_integer_mul(a, c);
-    unsigned int bd = recursive_integer_mul(b, d);
+    unsigned long long ac = karatsuba_integer_mul(a, c);
+    unsigned long long bd = karatsuba_integer_mul(b, d);
     // (a+b)(c+d)
-    unsigned int apbtcpd = recursive_integer_mul(a+b, c+d);
+    unsigned long long apbtcpd = karatsuba_integer_mul(a+b, c+d);
     // (ad + bc)
-    unsigned int atdpdtc = apbtcpd - ac - bd;
+    unsigned long long atdpdtc = apbtcpd - ac - bd;
 
     return (pow(10, 2*m)*ac) + (pow(10, m)*atdpdtc) + bd;
 }
@@ -136,7 +112,7 @@ int main(int /*argc*/, char** /*argv*/)
 {   
     unsigned int a = 123459999, b = 7896349;
 
-    unsigned int b_mul_res = 0, rec_mul_res = 0, kartsuba_mul_res = 0;
+    unsigned long long b_mul_res = 0, rec_mul_res = 0, kartsuba_mul_res = 0;
     {
         ExecutionTimerMs execTimer_("Basic multiplication function");
         b_mul_res = basic_integer_mul(a,b);
