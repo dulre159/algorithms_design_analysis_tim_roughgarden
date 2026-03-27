@@ -49,8 +49,8 @@ tuple<unsigned long long, unsigned long long> split_num(unsigned int x, unsigned
 
 // Recursive multiplication
 // Input numbers x and y assumed integers and having n digits
-// 'a' and 'b' are the half of x
-// 'c' and 'd' are the half of y
+// 'a' and 'b' are respectively the first and second half of x
+// 'c' and 'd' are respectively the first and second half of y
 // select m that is lower then n
 // B is the base; assume B=10
 // x = (B^m)*a + b ; y = (B^m)*c + d
@@ -79,8 +79,8 @@ unsigned long long recursive_integer_mul(unsigned int x, unsigned int y)
 
 // Karatsuba multiplication
 // Input numbers x and y assumed integers
-// 'a' and 'b' are the half of x
-// 'c' and 'd' are the half of y
+// 'a' and 'b' are respectively the first and second half of x
+// 'c' and 'd' are respectively the first and second half of y
 // x = (10^(n/2))*a + b ; y = (10^(n/2))*c + d
 // x*y = 10^n * ac + 10^n/2 * (ad+bc) + bd
 // (ad+bc) = (a+b)(c+d) - ac - bd
