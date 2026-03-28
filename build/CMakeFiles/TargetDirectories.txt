@@ -1,0 +1,14 @@
+/home/drcat/workspace/generic/algorithms_design_analysis_tim_roughgarden/build/CMakeFiles/edit_cache.dir
+/home/drcat/workspace/generic/algorithms_design_analysis_tim_roughgarden/build/CMakeFiles/rebuild_cache.dir
+/home/drcat/workspace/generic/algorithms_design_analysis_tim_roughgarden/build/integers_multiplication/CMakeFiles/integers_multiplication.dir
+/home/drcat/workspace/generic/algorithms_design_analysis_tim_roughgarden/build/integers_multiplication/CMakeFiles/edit_cache.dir
+/home/drcat/workspace/generic/algorithms_design_analysis_tim_roughgarden/build/integers_multiplication/CMakeFiles/rebuild_cache.dir
+/home/drcat/workspace/generic/algorithms_design_analysis_tim_roughgarden/build/inversions_counter/CMakeFiles/inversions_counter.dir
+/home/drcat/workspace/generic/algorithms_design_analysis_tim_roughgarden/build/inversions_counter/CMakeFiles/edit_cache.dir
+/home/drcat/workspace/generic/algorithms_design_analysis_tim_roughgarden/build/inversions_counter/CMakeFiles/rebuild_cache.dir
+/home/drcat/workspace/generic/algorithms_design_analysis_tim_roughgarden/build/closest_pair/CMakeFiles/closest_pair.dir
+/home/drcat/workspace/generic/algorithms_design_analysis_tim_roughgarden/build/closest_pair/CMakeFiles/edit_cache.dir
+/home/drcat/workspace/generic/algorithms_design_analysis_tim_roughgarden/build/closest_pair/CMakeFiles/rebuild_cache.dir
+/home/drcat/workspace/generic/algorithms_design_analysis_tim_roughgarden/build/sorting/CMakeFiles/sorting.dir
+/home/drcat/workspace/generic/algorithms_design_analysis_tim_roughgarden/build/sorting/CMakeFiles/edit_cache.dir
+/home/drcat/workspace/generic/algorithms_design_analysis_tim_roughgarden/build/sorting/CMakeFiles/rebuild_cache.dir

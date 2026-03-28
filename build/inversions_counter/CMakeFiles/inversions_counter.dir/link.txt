@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/inversions_counter.dir/main.cpp.o CMakeFiles/inversions_counter.dir/__/commons/commons.cpp.o CMakeFiles/inversions_counter.dir/__/commons/vector_utils.cpp.o -o inversions_counter
